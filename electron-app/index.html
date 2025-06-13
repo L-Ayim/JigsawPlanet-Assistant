@@ -1,24 +1,30 @@
 <!DOCTYPE html>
-<html class="dark">
+<html>
   <head>
     <meta charset="UTF-8" />
     <title>Jigsaw Planet Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="bg-gray-900 text-gray-100 min-h-screen flex items-center justify-center">
-    <main class="w-full max-w-md p-4">
-      <h1 class="text-xl font-semibold mb-4 text-center">Puzzles</h1>
-      <ul id="puzzleList" class="space-y-2"></ul>
+  <body class="bg-neutral-800 text-gray-100 min-h-screen flex items-center justify-center">
+    <main class="w-full max-w-md p-4 space-y-4">
+      <h1 class="text-2xl font-semibold text-center text-sky-400">Jigsaw Planet Assistant</h1>
+      <h2 class="text-xl font-medium text-center">Puzzles</h2>
+      <p class="text-center text-gray-300">Pick a puzzle from the list to play assisted.</p>
+      <div id="loading" class="text-center">Loading puzzles...</div>
+      <ul id="puzzleList" class="space-y-2 hidden"></ul>
     </main>
 
     <script>
       window.electronAPI.getPuzzles().then(puzzles => {
         const list = document.getElementById('puzzleList');
+        const loading = document.getElementById('loading');
+        loading.style.display = 'none';
+        list.classList.remove('hidden');
         puzzles.forEach(p => {
           const li = document.createElement('li');
           const link = document.createElement('a');
           link.href = '#';
-          link.className = 'block rounded bg-gray-800 hover:bg-gray-700 px-3 py-2';
+          link.className = 'block rounded border border-sky-500 text-sky-200 hover:bg-sky-600 hover:text-white px-3 py-2';
           link.textContent = p.title;
           link.addEventListener('click', () => {
             window.electronAPI.labelPuzzle(p.url);

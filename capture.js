@@ -1,6 +1,5 @@
 // capture.js
 const puppeteer = require('puppeteer');
-const readline = require('readline');
 
 async function scrapePuzzles() {
   const headlessBrowser = await puppeteer.launch({
@@ -191,49 +190,6 @@ async function labelPuzzle(selectedUrl) {
   }, pieces);
 }
 
-if (require.main === module) {
-  (async () => {
-    const puzzles = await scrapePuzzles();
-    if (!puzzles.length) return;
-
-    console.log('\n✂️  Available puzzles on jigsawplanet.com:\n');
-    puzzles.forEach((p, idx) => {
-      const shortTitle =
-        p.title.length > 60 ? p.title.slice(0, 57) + '...' : p.title;
-      console.log(`  [${idx + 1}] ${shortTitle}`);
-    });
-    console.log('\n');
-
-    const chosenNum = await new Promise(resolve => {
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-      });
-      rl.question(
-        `Enter the number of the puzzle you want to label (1–${puzzles.length}):\n> `,
-        answer => {
-          rl.close();
-          resolve(answer.trim());
-        }
-      );
-    });
-
-    const chosenIndex = Number(chosenNum);
-    if (
-      Number.isNaN(chosenIndex) ||
-      chosenIndex < 1 ||
-      chosenIndex > puzzles.length
-    ) {
-      console.error(`❌ Invalid choice: ${chosenNum}`);
-      process.exit(1);
-    }
-
-    const selectedPuzzle = puzzles[chosenIndex - 1];
-    const { title: selectedTitle, url: selectedUrl } = selectedPuzzle;
-    console.log(`\n🔎 You selected [${chosenIndex}] ${selectedTitle}\n   → ${selectedUrl}\n`);
-
-    await labelPuzzle(selectedUrl);
-  })();
-}
+// CLI functionality removed; this module is now used exclusively by the Electron GUI
 
 module.exports = { scrapePuzzles, labelPuzzle };
