@@ -25,24 +25,28 @@ A minimal CLI tool that:
 
 2. Install dependencies:
    ```bash
-   npm install puppeteer
+   npm install
    ```
 
 ---
 
 ## Usage
 
-Run:
+Run the CLI:
 
 ```bash
 node capture.js
 ```
 
-1. A list of puzzles (title + index) will appear.  
-2. Enter a number to open that puzzle in a browser.  
-3. Each piece will be badged with its load-order ID.  
-4. Press “L” to toggle badges on/off.  
-5. Close the browser when done.
+Or launch the GUI:
+
+```bash
+npm start
+```
+
+In the GUI, click a puzzle title to open it in a new browser window. Each
+piece will be badged with its load-order ID. Press "L" to toggle badges and
+close the browser when done.
 
 ---
 

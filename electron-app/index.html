@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Jigsaw Planet Assistant</title>
+</head>
+<body>
+  <h1>Puzzles</h1>
+  <ul id="puzzleList"></ul>
+
+  <script>
+    window.electronAPI.getPuzzles().then(puzzles => {
+      const list = document.getElementById('puzzleList');
+      puzzles.forEach(p => {
+        const li = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = '#';
+        link.textContent = p.title;
+        link.addEventListener('click', () => {
+          window.electronAPI.labelPuzzle(p.url);
+        });
+        li.appendChild(link);
+        list.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>
