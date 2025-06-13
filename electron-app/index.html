@@ -39,6 +39,12 @@
         </div>
         <p class="text-center text-gray-300">Loading puzzles...</p>
       </div>
+      <div id="puzzleLoading" class="space-y-2 hidden">
+        <div class="progress-container w-full h-2 bg-neutral-700 rounded overflow-hidden">
+          <div class="progress-bar w-full h-2 relative"></div>
+        </div>
+        <p class="text-center text-gray-300">Loading puzzle...</p>
+      </div>
       <p id="pickText" class="text-center text-gray-300 hidden">Pick a puzzle from the list to play assisted.</p>
       <ul id="puzzleList" class="space-y-2 hidden"></ul>
     </main>
@@ -48,6 +54,7 @@
         const list = document.getElementById('puzzleList');
         const loading = document.getElementById('loading');
         const pickText = document.getElementById('pickText');
+        const puzzleLoading = document.getElementById('puzzleLoading');
         loading.style.display = 'none';
         list.classList.remove('hidden');
         pickText.classList.remove('hidden');
@@ -57,8 +64,13 @@
           link.href = '#';
           link.className = 'block rounded border border-sky-500 text-sky-200 hover:bg-sky-600 hover:text-white px-3 py-2';
           link.textContent = p.title;
-          link.addEventListener('click', () => {
-            window.electronAPI.labelPuzzle(p.url);
+          link.addEventListener('click', async e => {
+            e.preventDefault();
+            puzzleLoading.classList.remove('hidden');
+            list.querySelectorAll('a').forEach(a => (a.style.pointerEvents = 'none'));
+            await window.electronAPI.labelPuzzle(p.url);
+            puzzleLoading.classList.add('hidden');
+            list.querySelectorAll('a').forEach(a => (a.style.pointerEvents = ''));
           });
           li.appendChild(link);
           list.appendChild(li);
