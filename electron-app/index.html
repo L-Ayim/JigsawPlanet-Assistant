@@ -4,13 +4,40 @@
     <meta charset="UTF-8" />
     <title>Jigsaw Planet Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @keyframes progress {
+        0% {
+          left: -40%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+      .progress-container {
+        position: relative;
+      }
+      .progress-bar::before {
+        content: '';
+        position: absolute;
+        left: -40%;
+        width: 40%;
+        height: 100%;
+        background-color: rgb(56 189 248);
+        animation: progress 1s infinite;
+      }
+    </style>
   </head>
   <body class="bg-neutral-800 text-gray-100 min-h-screen flex items-center justify-center">
     <main class="w-full max-w-md p-4 space-y-4">
       <h1 class="text-2xl font-semibold text-center text-sky-400">Jigsaw Planet Assistant</h1>
       <h2 class="text-xl font-medium text-center">Puzzles</h2>
       <p class="text-center text-gray-300">Pick a puzzle from the list to play assisted.</p>
-      <div id="loading" class="text-center">Loading puzzles...</div>
+      <div id="loading" class="space-y-2">
+        <div class="progress-container w-full h-2 bg-neutral-700 rounded overflow-hidden">
+          <div class="progress-bar w-full h-2 relative"></div>
+        </div>
+        <p class="text-center text-gray-300">Loading puzzles...</p>
+      </div>
       <ul id="puzzleList" class="space-y-2 hidden"></ul>
     </main>
 
