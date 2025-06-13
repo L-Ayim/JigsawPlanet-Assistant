@@ -6,6 +6,8 @@ A minimal CLI tool that:
 2. Opens a browser window for your chosen puzzle.
 3. Overlays each puzzle piece with its load-order number.
 
+The included Electron GUI features a minimalist dark theme built with Tailwind CSS.
+
 ---
 
 ## Prerequisites
@@ -38,7 +40,7 @@ Run the CLI:
 node capture.js
 ```
 
-Or launch the GUI:
+Or launch the GUI (now styled with Tailwind CSS in dark mode):
 
 ```bash
 npm start
