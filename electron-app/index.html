@@ -29,15 +29,17 @@
   </head>
   <body class="bg-neutral-800 text-gray-100 min-h-screen flex items-center justify-center">
     <main class="w-full max-w-md p-4 space-y-4">
-      <h1 class="text-2xl font-semibold text-center text-sky-400">Jigsaw Planet Assistant</h1>
-      <h2 class="text-xl font-medium text-center">Puzzles</h2>
-      <p class="text-center text-gray-300">Pick a puzzle from the list to play assisted.</p>
+      <h1 class="text-2xl font-semibold text-center text-sky-400 flex items-center justify-center gap-2">
+        <span class="text-3xl">🧩</span>
+        Jigsaw Planet Assistant
+      </h1>
       <div id="loading" class="space-y-2">
         <div class="progress-container w-full h-2 bg-neutral-700 rounded overflow-hidden">
           <div class="progress-bar w-full h-2 relative"></div>
         </div>
         <p class="text-center text-gray-300">Loading puzzles...</p>
       </div>
+      <p id="pickText" class="text-center text-gray-300 hidden">Pick a puzzle from the list to play assisted.</p>
       <ul id="puzzleList" class="space-y-2 hidden"></ul>
     </main>
 
@@ -45,8 +47,10 @@
       window.electronAPI.getPuzzles().then(puzzles => {
         const list = document.getElementById('puzzleList');
         const loading = document.getElementById('loading');
+        const pickText = document.getElementById('pickText');
         loading.style.display = 'none';
         list.classList.remove('hidden');
+        pickText.classList.remove('hidden');
         puzzles.forEach(p => {
           const li = document.createElement('li');
           const link = document.createElement('a');
