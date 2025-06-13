@@ -64,7 +64,11 @@ async function labelPuzzle(selectedUrl) {
     Object.defineProperty(proto, 'src', {
       set(v) {
         const ret = desc.set.call(this, v);
-        if (typeof v === 'string' && v.startsWith('data:image/png;base64,')) {
+        if (
+          typeof v === 'string' &&
+          v.startsWith('data:image/png;base64,') &&
+          !this.dataset.pieceId
+        ) {
           const id = ++window._pieceCount;
           this.dataset.pieceId = id;
           window.inlinePieces.push({ id, time: performance.now() });
