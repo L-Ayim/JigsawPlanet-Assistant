@@ -2,28 +2,20 @@
 const puppeteer = require('puppeteer');
 const readline = require('readline');
 
-(async () => {
-  //
-  // ────────────────────────────────────────────────────────────────────────────────
-  // STAGE 1: SCRAPE PUZZLE NAMES + URLs (HEADLESS, NO-COUNTING)
-  // ────────────────────────────────────────────────────────────────────────────────
-  //
+async function scrapePuzzles() {
   const headlessBrowser = await puppeteer.launch({
     headless: true,
     args: ['--no-sandbox'],
   });
   const [headlessPage] = await headlessBrowser.pages();
 
-  // Go to the JigsawPlanet homepage (or any “gallery” page)
   await headlessPage.goto('https://www.jigsawplanet.com/', {
     waitUntil: 'domcontentloaded',
     timeout: 60000,
   });
 
-  // Give thumbnails / links a moment to render
   await new Promise(res => setTimeout(res, 2000));
 
-  // Scrape all <a href*="?rc=play&pid="> → { title, url }
   const puzzles = await headlessPage.evaluate(() => {
     const anchors = Array.from(
       document.querySelectorAll('a[href*="?rc=play&pid="]')
@@ -36,7 +28,6 @@ const readline = require('readline');
       if (seen.has(href)) continue;
       seen.add(href);
 
-      // Try <img alt="..."> for a human-friendly title
       let title = a.querySelector('img')?.alt?.trim();
       if (!title) title = a.getAttribute('title')?.trim();
       if (!title) title = a.innerText.trim();
@@ -50,58 +41,14 @@ const readline = require('readline');
   if (!puzzles.length) {
     console.error('❌ No playable puzzles found on jigsawplanet.com');
     await headlessBrowser.close();
-    process.exit(1);
+    return [];
   }
 
   await headlessBrowser.close();
+  return puzzles;
+}
 
-  // Print a 1-based menu of puzzle names (no piece counts)
-  console.log('\n✂️  Available puzzles on jigsawplanet.com:\n');
-  puzzles.forEach((p, idx) => {
-    // Truncate long titles to 60 chars
-    const shortTitle =
-      p.title.length > 60 ? p.title.slice(0, 57) + '...' : p.title;
-    console.log(`  [${idx + 1}] ${shortTitle}`);
-  });
-  console.log('\n');
-
-  // Prompt the user to pick a puzzle by number (1-based)
-  const chosenNum = await new Promise(resolve => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-    rl.question(
-      `Enter the number of the puzzle you want to label (1–${puzzles.length}):\n> `,
-      answer => {
-        rl.close();
-        resolve(answer.trim());
-      }
-    );
-  });
-
-  const chosenIndex = Number(chosenNum);
-  if (
-    Number.isNaN(chosenIndex) ||
-    chosenIndex < 1 ||
-    chosenIndex > puzzles.length
-  ) {
-    console.error(`❌ Invalid choice: ${chosenNum}`);
-    process.exit(1);
-  }
-
-  // Convert 1-based to 0-based index
-  const selectedPuzzle = puzzles[chosenIndex - 1];
-  const { title: selectedTitle, url: selectedUrl } = selectedPuzzle;
-  console.log(
-    `\n🔎 You selected [${chosenIndex}] ${selectedTitle}\n   → ${selectedUrl}\n`
-  );
-
-  //
-  // ────────────────────────────────────────────────────────────────────────────────
-  // STAGE 2: OPEN VISIBLE BROWSER TO LABEL THE SELECTED PUZZLE
-  // ────────────────────────────────────────────────────────────────────────────────
-  //
+async function labelPuzzle(selectedUrl) {
   const browser = await puppeteer.launch({
     headless: false,
     args: ['--start-maximized'],
@@ -109,7 +56,6 @@ const readline = require('readline');
   });
   const [page] = await browser.pages();
 
-  // ── INJECT INLINE-IMAGE TAGGING LOGIC BEFORE NAVIGATION ─────────────────────────
   await page.evaluateOnNewDocument(() => {
     window.inlinePieces = [];
     window._pieceCount = 0;
@@ -134,18 +80,14 @@ const readline = require('readline');
     });
   });
 
-  // Navigate to the chosen puzzle URL
   await page.goto(selectedUrl, {
     waitUntil: 'domcontentloaded',
     timeout: 60000,
   });
 
-  // Wait for at least one piece (with data-piece-id) to appear (max 20s)
   await page.waitForSelector('img[data-piece-id]', { timeout: 20000 });
-  // Give another 2 seconds so all pieces finish streaming
   await new Promise(res => setTimeout(res, 2000));
 
-  // Collect & sort all pieces by load time
   const pieces = await page.evaluate(() => {
     const start = Math.min(...window.inlinePieces.map(p => p.time));
     return window.inlinePieces
@@ -153,11 +95,9 @@ const readline = require('readline');
       .sort((a, b) => a.t - b.t);
   });
 
-  // ── INJECT BADGE-OVERLAY LOGIC ─────────────────────────────────────────────────
   await page.evaluate(pieces => {
     const labeledBadges = {};
 
-    // Create a full-screen overlay <div> for badges
     const overlay = document.createElement('div');
     overlay.id = 'badgeOverlay';
     Object.assign(overlay.style, {
@@ -171,7 +111,6 @@ const readline = require('readline');
     });
     document.body.appendChild(overlay);
 
-    // Utility: check if a rect is within the viewport
     function isInViewport(rect) {
       return !(
         rect.right < 0 ||
@@ -181,7 +120,6 @@ const readline = require('readline');
       );
     }
 
-    // Label each piece exactly once
     for (const { id } of pieces) {
       const img = document.querySelector(`img[data-piece-id="${id}"]`);
       if (!img) continue;
@@ -208,7 +146,6 @@ const readline = require('readline');
       labeledBadges[id] = badge;
     }
 
-    // requestAnimationFrame loop to keep each badge positioned
     function updateBadges() {
       for (const pieceId in labeledBadges) {
         const img = document.querySelector(`img[data-piece-id="${pieceId}"]`);
@@ -230,7 +167,6 @@ const readline = require('readline');
     }
     requestAnimationFrame(updateBadges);
 
-    // Debounce window resize so badges recalc at end of resizing
     let resizeTimeout = null;
     window.addEventListener('resize', () => {
       if (resizeTimeout) clearTimeout(resizeTimeout);
@@ -245,7 +181,6 @@ const readline = require('readline');
       }, 100);
     });
 
-    // Toggle badge visibility with the “L” key
     let badgesVisible = true;
     document.addEventListener('keydown', e => {
       if (e.key.toLowerCase() === 'l') {
@@ -254,7 +189,51 @@ const readline = require('readline');
       }
     });
   }, pieces);
+}
 
-  // The visible browser now stays open with badges tracking each piece.
-  // You can drag pieces around, resize the window, toggle badges with “L,” etc.
-})();
+if (require.main === module) {
+  (async () => {
+    const puzzles = await scrapePuzzles();
+    if (!puzzles.length) return;
+
+    console.log('\n✂️  Available puzzles on jigsawplanet.com:\n');
+    puzzles.forEach((p, idx) => {
+      const shortTitle =
+        p.title.length > 60 ? p.title.slice(0, 57) + '...' : p.title;
+      console.log(`  [${idx + 1}] ${shortTitle}`);
+    });
+    console.log('\n');
+
+    const chosenNum = await new Promise(resolve => {
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+      });
+      rl.question(
+        `Enter the number of the puzzle you want to label (1–${puzzles.length}):\n> `,
+        answer => {
+          rl.close();
+          resolve(answer.trim());
+        }
+      );
+    });
+
+    const chosenIndex = Number(chosenNum);
+    if (
+      Number.isNaN(chosenIndex) ||
+      chosenIndex < 1 ||
+      chosenIndex > puzzles.length
+    ) {
+      console.error(`❌ Invalid choice: ${chosenNum}`);
+      process.exit(1);
+    }
+
+    const selectedPuzzle = puzzles[chosenIndex - 1];
+    const { title: selectedTitle, url: selectedUrl } = selectedPuzzle;
+    console.log(`\n🔎 You selected [${chosenIndex}] ${selectedTitle}\n   → ${selectedUrl}\n`);
+
+    await labelPuzzle(selectedUrl);
+  })();
+}
+
+module.exports = { scrapePuzzles, labelPuzzle };
