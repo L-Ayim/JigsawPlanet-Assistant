@@ -1,12 +1,12 @@
 # Jigsaw Planet Assistant
 
-A minimal CLI tool that:
+A minimal tool that:
 
 1. Scrapes Jigsaw Planet to list available puzzles.
 2. Opens a browser window for your chosen puzzle.
 3. Overlays each puzzle piece with its load-order number.
 
-The included Electron GUI features a minimalist dark theme built with Tailwind CSS.
+The included Electron GUI uses Tailwind CSS with a neutral 800 palette and a sky accent.
 
 ---
 
@@ -34,13 +34,7 @@ The included Electron GUI features a minimalist dark theme built with Tailwind C
 
 ## Usage
 
-Run the CLI:
-
-```bash
-node capture.js
-```
-
-Or launch the GUI (now styled with Tailwind CSS in dark mode):
+Launch the Electron GUI:
 
 ```bash
 npm start
