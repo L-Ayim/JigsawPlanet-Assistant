@@ -40,6 +40,12 @@ Launch the Electron GUI:
 npm start
 ```
 
+On Windows you can run the helper script instead:
+
+```powershell
+./start-jigsaw.ps1
+```
+
 In the GUI, click a puzzle title to open it in a new browser window. Each
 piece will be badged with its load-order ID. Press "L" to toggle badges and
 close the browser when done.
