@@ -12,8 +12,6 @@
   "description": "",
   "dependencies": {
     "electron": "^36.4.0",
-    "puppeteer": "^24.9.0",
-    "jsdom": "^26.1.0",
-    "node-fetch": "^3.3.2"
+    "puppeteer": "^24.9.0"
   }
 }

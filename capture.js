@@ -1,44 +1,50 @@
 // capture.js
 const puppeteer = require('puppeteer');
-const fetch = require('node-fetch');
-const { JSDOM } = require('jsdom');
 
 async function scrapePuzzles() {
-  const res = await fetch('https://www.jigsawplanet.com/');
-  if (!res.ok) {
-    console.error(
-      `❌ Failed to fetch puzzles from jigsawplanet.com: ${res.statusText}`
+  const headlessBrowser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox'],
+  });
+  const [headlessPage] = await headlessBrowser.pages();
+
+  await headlessPage.goto('https://www.jigsawplanet.com/', {
+    waitUntil: 'domcontentloaded',
+    timeout: 60000,
+  });
+
+  await new Promise(res => setTimeout(res, 2000));
+
+  const puzzles = await headlessPage.evaluate(() => {
+    const anchors = Array.from(
+      document.querySelectorAll('a[href*="?rc=play&pid="]')
     );
+    const seen = new Set();
+    const list = [];
+
+    for (const a of anchors) {
+      const href = a.href;
+      if (seen.has(href)) continue;
+      seen.add(href);
+
+      let title = a.querySelector('img')?.alt?.trim();
+      if (!title) title = a.getAttribute('title')?.trim();
+      if (!title) title = a.innerText.trim();
+      if (!title) title = href;
+
+      list.push({ title, url: href });
+    }
+    return list;
+  });
+
+  if (!puzzles.length) {
+    console.error('❌ No playable puzzles found on jigsawplanet.com');
+    await headlessBrowser.close();
     return [];
   }
 
-  const html = await res.text();
-  const { document } = new JSDOM(html).window;
-
-  const anchors = Array.from(
-    document.querySelectorAll('a[href*="?rc=play&pid="]')
-  );
-  const seen = new Set();
-  const list = [];
-
-  for (const a of anchors) {
-    const href = a.href;
-    if (seen.has(href)) continue;
-    seen.add(href);
-
-    let title = a.querySelector('img')?.alt?.trim();
-    if (!title) title = a.getAttribute('title')?.trim();
-    if (!title) title = a.textContent.trim();
-    if (!title) title = href;
-
-    list.push({ title, url: href });
-  }
-
-  if (!list.length) {
-    console.error('❌ No playable puzzles found on jigsawplanet.com');
-  }
-
-  return list;
+  await headlessBrowser.close();
+  return puzzles;
 }
 
 async function labelPuzzle(selectedUrl) {
