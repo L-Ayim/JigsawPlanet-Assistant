@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const { scrapePuzzles, labelPuzzle } = require('../capture');
+const { scrapePuzzles } = require('../capture');
 
 async function createWindow() {
   const win = new BrowserWindow({
@@ -21,7 +21,15 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle('label-puzzle', async (_event, url) => {
-    await labelPuzzle(url);
+    const puzzleWin = new BrowserWindow({
+      width: 1024,
+      height: 768,
+      webPreferences: {
+        preload: path.join(__dirname, 'puzzlePreload.js'),
+      },
+    });
+
+    await puzzleWin.loadURL(url);
   });
 
   createWindow();
