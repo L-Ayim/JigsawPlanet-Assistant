@@ -26,6 +26,7 @@ app.whenReady().then(() => {
       height: 768,
       webPreferences: {
         preload: path.join(__dirname, 'puzzlePreload.js'),
+        contextIsolation: false,
       },
     });
 
