@@ -52,10 +52,3 @@ Select a puzzle in the app to open it in a new Electron window. Each piece displ
   image as it loads and overlays a numbered badge on every piece. The overlay
   keeps the numbers aligned as pieces are moved around.
 
-## Troubleshooting
-
-If no puzzles load, try raising the timeout values in `capture.js`. Puppeteer is still used only for scraping the puzzle list.
-
-## Author
-
-Lawrence Ayim — [L-Ayim](https://github.com/L-Ayim)
