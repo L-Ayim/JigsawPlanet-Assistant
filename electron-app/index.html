@@ -27,28 +27,28 @@
       }
     </style>
   </head>
-  <body class="bg-neutral-800 text-gray-100 min-h-screen flex items-center justify-center">
+  <body class="bg-black text-blue-300 min-h-screen flex items-center justify-center">
     <main class="w-full max-w-md p-4 space-y-4">
-      <h1 class="text-2xl font-semibold text-center text-sky-400 flex items-center justify-center gap-2">
-        <span class="text-3xl">🧩</span>
+      <h1 class="text-2xl font-semibold text-center text-blue-400 flex items-center justify-center gap-2">
+        <span class="text-3xl text-blue-400">🧩</span>
         Jigsaw Planet Assistant
       </h1>
       <div id="loading" class="space-y-2">
-        <div class="progress-container w-full h-2 bg-neutral-700 rounded overflow-hidden">
+        <div class="progress-container w-full h-2 bg-black rounded overflow-hidden">
           <div class="progress-bar w-full h-2 relative"></div>
         </div>
-        <p class="text-center text-gray-300">Loading puzzles...</p>
+        <p class="text-center text-blue-300">Loading puzzles...</p>
       </div>
       <div id="puzzleLoading" class="space-y-2 hidden">
-        <p id="currentPuzzleTitle" class="text-center text-gray-300"></p>
-        <p id="resizeWarning" class="text-center text-yellow-400 text-sm hidden">
+        <p id="currentPuzzleTitle" class="text-center text-blue-300"></p>
+        <p id="resizeWarning" class="text-center text-blue-300 text-sm hidden">
           Avoid resizing the window while the puzzle loads.
         </p>
-        <div class="progress-container w-full h-2 bg-neutral-700 rounded overflow-hidden">
+        <div class="progress-container w-full h-2 bg-black rounded overflow-hidden">
           <div class="progress-bar w-full h-2 relative"></div>
         </div>
       </div>
-      <p id="pickText" class="text-center text-gray-300 hidden">Pick a puzzle from the list to play assisted.</p>
+      <p id="pickText" class="text-center text-blue-300 hidden">Pick a puzzle from the list to play assisted.</p>
       <ul id="puzzleList" class="space-y-2 hidden"></ul>
     </main>
 
@@ -67,7 +67,7 @@
           const li = document.createElement('li');
           const link = document.createElement('a');
           link.href = '#';
-          link.className = 'block rounded border border-sky-500 text-sky-200 hover:bg-sky-600 hover:text-white px-3 py-2';
+          link.className = 'block rounded border border-blue-500 text-blue-200 hover:bg-blue-600 hover:text-blue-200 px-3 py-2';
           link.textContent = p.title;
           link.addEventListener('click', async e => {
             e.preventDefault();
