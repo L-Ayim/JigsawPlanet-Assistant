@@ -20,13 +20,17 @@ app.whenReady().then(() => {
     return puzzles;
   });
 
-  ipcMain.handle('label-puzzle', async (event, url) => {
-    // Load the selected puzzle in the existing window instead of opening
-    // a new one. puzzlePreload.js will be injected by preload.js when the
-    // window navigates to jigsawplanet.com, keeping everything in a single
-    // window.
-    const win = BrowserWindow.fromWebContents(event.sender);
-    await win.loadURL(url);
+  ipcMain.handle('label-puzzle', async (_event, url) => {
+    const puzzleWin = new BrowserWindow({
+      width: 1024,
+      height: 768,
+      webPreferences: {
+        preload: path.join(__dirname, 'puzzlePreload.js'),
+        contextIsolation: false,
+      },
+    });
+
+    await puzzleWin.loadURL(url);
   });
 
   createWindow();
