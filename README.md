@@ -31,11 +31,11 @@ On Windows you can also run:
 ./start-jigsaw.ps1
 ```
 
-Select a puzzle in the app to open it. Each piece displays its load number; press **L** to toggle these labels.
+Select a puzzle in the app to open it in a new Electron window. Each piece displays its load number; press **L** to toggle these labels.
 
 ## Troubleshooting
 
-If no puzzles load or Puppeteer times out, try raising the timeout values in `capture.js`.
+If no puzzles load, try raising the timeout values in `capture.js`. Puppeteer is still used only for scraping the puzzle list.
 
 ## Author
 
